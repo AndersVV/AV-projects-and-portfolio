@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Anders Villwock">
+<meta name="dcterms.date" content="2025-11-24">
+
+<title>Frankenstein NLP Project</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="frankenstein_nlp_project_files/libs/clipboard/clipboard.min.js"></script>
+<script src="frankenstein_nlp_project_files/libs/quarto-html/quarto.js"></script>
+<script src="frankenstein_nlp_project_files/libs/quarto-html/popper.min.js"></script>
+<script src="frankenstein_nlp_project_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="frankenstein_nlp_project_files/libs/quarto-html/anchor.min.js"></script>
+<link href="frankenstein_nlp_project_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="frankenstein_nlp_project_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="frankenstein_nlp_project_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="frankenstein_nlp_project_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="frankenstein_nlp_project_files/libs/bootstrap/bootstrap-8a79a254b8e706d3c925cde0a310d4f0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of Contents</h2>
+   
+  <ul>
+  <li><a href="#setup-libraries-functions-and-data-loading" id="toc-setup-libraries-functions-and-data-loading" class="nav-link active" data-scroll-target="#setup-libraries-functions-and-data-loading"><span class="header-section-number">1</span> Setup: Libraries, Functions, and Data Loading</a>
+  <ul class="collapse">
+  <li><a href="#libraries" id="toc-libraries" class="nav-link" data-scroll-target="#libraries"><span class="header-section-number">1.1</span> Libraries</a></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions"><span class="header-section-number">1.2</span> Functions</a></li>
+  <li><a href="#sourcing-raw-text" id="toc-sourcing-raw-text" class="nav-link" data-scroll-target="#sourcing-raw-text"><span class="header-section-number">1.3</span> Sourcing Raw Text</a></li>
+  </ul></li>
+  <li><a href="#initial-eda" id="toc-initial-eda" class="nav-link" data-scroll-target="#initial-eda"><span class="header-section-number">2</span> Initial EDA</a></li>
+  <li><a href="#cleaning-tokenizing-text" id="toc-cleaning-tokenizing-text" class="nav-link" data-scroll-target="#cleaning-tokenizing-text"><span class="header-section-number">3</span> Cleaning + Tokenizing Text</a>
+  <ul class="collapse">
+  <li><a href="#cleaning" id="toc-cleaning" class="nav-link" data-scroll-target="#cleaning"><span class="header-section-number">3.1</span> Cleaning</a></li>
+  <li><a href="#tokenizing" id="toc-tokenizing" class="nav-link" data-scroll-target="#tokenizing"><span class="header-section-number">3.2</span> Tokenizing</a>
+  <ul class="collapse">
+  <li><a href="#for-1831-text" id="toc-for-1831-text" class="nav-link" data-scroll-target="#for-1831-text"><span class="header-section-number">3.2.1</span> for 1831 text</a></li>
+  <li><a href="#for-1818-text" id="toc-for-1818-text" class="nav-link" data-scroll-target="#for-1818-text"><span class="header-section-number">3.2.2</span> For 1818 Text</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#unifying-dataframes" id="toc-unifying-dataframes" class="nav-link" data-scroll-target="#unifying-dataframes"><span class="header-section-number">4</span> Unifying Dataframes</a></li>
+  <li><a href="#first-visual-analysis" id="toc-first-visual-analysis" class="nav-link" data-scroll-target="#first-visual-analysis"><span class="header-section-number">5</span> First Visual Analysis</a></li>
+  <li><a href="#solution-1-randomly-dropping-values-in-1831" id="toc-solution-1-randomly-dropping-values-in-1831" class="nav-link" data-scroll-target="#solution-1-randomly-dropping-values-in-1831"><span class="header-section-number">6</span> Solution 1: Randomly Dropping Values in 1831</a></li>
+  <li><a href="#solution-2-imputing-new-values-in-1818" id="toc-solution-2-imputing-new-values-in-1818" class="nav-link" data-scroll-target="#solution-2-imputing-new-values-in-1818"><span class="header-section-number">7</span> Solution 2: Imputing new values in 1818</a></li>
+  <li><a href="#all-graphs" id="toc-all-graphs" class="nav-link" data-scroll-target="#all-graphs"><span class="header-section-number">8</span> All Graphs</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">9</span> Discussion</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="frankenstein_nlp_project.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Frankenstein NLP Project</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Anders Villwock </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            UW Madison DSHB and Adam Ross Nelson
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 24, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="setup-libraries-functions-and-data-loading" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Setup: Libraries, Functions, and Data Loading</h1>
+<section id="libraries" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="libraries"><span class="header-section-number">1.1</span> Libraries</h2>
+<div id="c2a91412" class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard Imports</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#%pip install nltk</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> nltk</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nltk.sentiment.vader <span class="im">import</span> SentimentIntensityAnalyzer</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nltk.tokenize <span class="im">import</span> sent_tokenize</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="1852f607" class="cell" data-execution_count="48">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Only required on the first run</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#nltk.download('vader_lexicon')</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#nltk.download('punkt', force=True)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#nltk.download('punkt_tab')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="functions" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="functions"><span class="header-section-number">1.2</span> Functions</h2>
+<div id="39f81a97" class="cell" data-execution_count="49">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cut_at_anchor(raw_text, anchor):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># remove HTML first</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    clean <span class="op">=</span> re.sub(<span class="vs">r'&lt;[^&gt;]+&gt;'</span>, <span class="st">''</span>, raw_text)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># normalize whitespace</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    clean <span class="op">=</span> re.sub(<span class="vs">r'\s+'</span>, <span class="st">' '</span>, clean)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># search for chapter heading</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> re.search(re.escape(anchor), clean)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> m:</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> clean[m.start():]</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Anchor not found!"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> clean</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="fe75122e" class="cell" data-execution_count="50">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Instantiate our analyzer</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sid <span class="op">=</span> SentimentIntensityAnalyzer()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sourcing-raw-text" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="sourcing-raw-text"><span class="header-section-number">1.3</span> Sourcing Raw Text</h2>
+<div id="ecf6ed6e" class="cell" data-execution_count="51">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>frank31 <span class="op">=</span> requests.get(<span class="st">'https://www.gutenberg.org/cache/epub/84/pg84-images.html'</span>).text</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="78df3403" class="cell" data-execution_count="52">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>frank18 <span class="op">=</span> requests.get(<span class="st">'https://www.gutenberg.org/files/41445/41445-h/41445-h.htm'</span>).text</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="initial-eda" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Initial EDA</h1>
+<div id="37ee7d86" class="cell" data-execution_count="53">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(frank31)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="53">
+<pre><code>465737</code></pre>
+</div>
+</div>
+<div id="504abc1f" class="cell" data-execution_count="54">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(frank18)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="54">
+<pre><code>430075</code></pre>
+</div>
+</div>
+At this point, we need to consider some additional cleaning steps. The text retrieved from Project Gutenberg contains a lot of extraneous information, such as the Project Gutenberg header and footer, which we need to remove before performing sentiment analysis. We also have other artifacts such as //r//n line breaks, ’\r\n
+<p></p>
+\r\n\r\n
+<p>
+</p><p>\r\n</p>
+<div id="de8198a5" class="cell" data-execution_count="55">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>frank31_count_r <span class="op">=</span> <span class="bu">len</span>(re.findall(<span class="vs">r'\r'</span>, frank31))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>frank31_count_n <span class="op">=</span> <span class="bu">len</span>(re.findall(<span class="vs">r'\n'</span>, frank31))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>frank31_count_p_tags <span class="op">=</span> <span class="bu">len</span>(re.findall(<span class="vs">r'&lt;/?p&gt;'</span>, frank31))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Carriage returns (</span><span class="ch">\\</span><span class="ss">r): </span><span class="sc">{</span>frank31_count_r<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Newlines (</span><span class="ch">\\</span><span class="ss">n): </span><span class="sc">{</span>frank31_count_n<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"&lt;p&gt; or &lt;/p&gt; tags: </span><span class="sc">{</span>frank31_count_p_tags<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Carriage returns (\r): 9006
+Newlines (\n): 9006
+&lt;p&gt; or &lt;/p&gt; tags: 1497</code></pre>
+</div>
+</div>
+<div id="9ddbcd3c" class="cell" data-execution_count="56">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>frank18_count_r <span class="op">=</span> <span class="bu">len</span>(re.findall(<span class="vs">r'\r'</span>, frank18))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>frank18_count_n <span class="op">=</span> <span class="bu">len</span>(re.findall(<span class="vs">r'\n'</span>, frank18))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>frank18_count_p_tags <span class="op">=</span> <span class="bu">len</span>(re.findall(<span class="vs">r'&lt;/?p&gt;'</span>, frank18))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Carriage returns (</span><span class="ch">\\</span><span class="ss">r): </span><span class="sc">{</span>frank18_count_r<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Newlines (</span><span class="ch">\\</span><span class="ss">n): </span><span class="sc">{</span>frank18_count_n<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"&lt;p&gt; or &lt;/p&gt; tags: </span><span class="sc">{</span>frank18_count_p_tags<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Carriage returns (\r): 7378
+Newlines (\n): 7378
+&lt;p&gt; or &lt;/p&gt; tags: 1526</code></pre>
+</div>
+</div>
+</section>
+<section id="cleaning-tokenizing-text" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Cleaning + Tokenizing Text</h1>
+<section id="cleaning" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="cleaning"><span class="header-section-number">3.1</span> Cleaning</h2>
+<div id="09454b10" class="cell" data-execution_count="57">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove carriage returns and newlines</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>frank31_clean <span class="op">=</span> re.sub(<span class="vs">r'[\r\n]+'</span>, <span class="st">' '</span>, frank31)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>frank18_clean <span class="op">=</span> re.sub(<span class="vs">r'[\r\n]+'</span>, <span class="st">' '</span>, frank18)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Optionally remove HTML paragraph artifacts</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>frank31_clean <span class="op">=</span> re.sub(<span class="vs">r'&lt;/?p&gt;'</span>, <span class="st">''</span>, frank31_clean)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>frank18_clean <span class="op">=</span> re.sub(<span class="vs">r'&lt;/?p&gt;'</span>, <span class="st">''</span>, frank18_clean)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Print a short preview and some basic info to avoid dumping the entire HTML</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"frank31_clean preview:"</span>, frank31_clean[:<span class="dv">500</span>].strip())</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"frank31_clean length:"</span>, <span class="bu">len</span>(frank31_clean))</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"frank18_clean length:"</span>, <span class="bu">len</span>(frank18_clean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>frank31_clean preview: &lt;!DOCTYPE html&gt; &lt;html lang="en"&gt;&lt;head&gt; &lt;meta charset="utf-8"&gt;&lt;style&gt; #pg-header div, #pg-footer div {     all: initial;     display: block;     margin-top: 1em;     margin-bottom: 1em;     margin-left: 2em; } #pg-footer div.agate {     font-size: 90%;     margin-top: 0;     margin-bottom: 0;     text-align: center; } #pg-footer li {     all: initial;     display: block;     margin-top: 1em;     margin-bottom: 1em;     text-indent: -0.6em; } #pg-footer div.secthead {     font-size: 110%;     font
+frank31_clean length: 450580
+frank18_clean length: 416349</code></pre>
+</div>
+</div>
+<div id="39a9e58a" class="cell" data-execution_count="58">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This gets rid of the html docstring </span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>frank31_clean <span class="op">=</span> re.sub(<span class="vs">r'&lt;[^&gt;]+&gt;'</span>, <span class="st">''</span>, frank31_clean),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>frank18_clean <span class="op">=</span> re.sub(<span class="vs">r'&lt;[^&gt;]+&gt;'</span>, <span class="st">''</span>, frank18_clean),</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="3e3a97c7" class="cell" data-execution_count="59">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>frank18_clean <span class="op">=</span> cut_at_anchor(frank18, <span class="st">"I am by birth a Genevese; and my family is one of the most distinguished of that republic."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="634c3e16" class="cell" data-execution_count="60">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>frank31_clean <span class="op">=</span> cut_at_anchor(frank31, <span class="st">" and my family is one of the most distinguished of that republic."</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#for currently unknown reasons, "I am by birth..." does not get recognized. I will for now continue as the impact of this error is low.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="tokenizing" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="tokenizing"><span class="header-section-number">3.2</span> Tokenizing</h2>
+<p>For this section, we are tokenizing the text so that they may be recognized by the sentiment analysis.</p>
+<section id="for-1831-text" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="for-1831-text"><span class="header-section-number">3.2.1</span> for 1831 text</h3>
+<div id="10c3d31b" class="cell" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>sentence_lev_sent_31 <span class="op">=</span>[]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> s <span class="kw">in</span> sent_tokenize(frank31_clean):</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    sentence_lev_sent_31.append(sid.polarity_scores(s)[<span class="st">'compound'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="456019ba" class="cell" data-execution_count="62">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sentence_lev_df_31 <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">'Sentence_31'</span>: sent_tokenize(frank31_clean),</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>     <span class="st">'Sentiment_31'</span>: sentence_lev_sent_31}</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>sentence_lev_df_31[<span class="st">'Sentiment_Smooth31'</span>] <span class="op">=</span> sentence_lev_df_31[<span class="st">'Sentiment_31'</span>].rolling(<span class="dv">30</span>).mean()</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>sentence_lev_df_31.sample(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="62">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sentence_31</th>
+<th data-quarto-table-cell-role="th">Sentiment_31</th>
+<th data-quarto-table-cell-role="th">Sentiment_Smooth31</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">712</td>
+<td>The servant instantly showed it to one of the ...</td>
+<td>0.0000</td>
+<td>-0.055750</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1918</td>
+<td>I enjoyed this scene, and yet my enjoyment was...</td>
+<td>0.7845</td>
+<td>0.269720</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">189</td>
+<td>She devoted herself to those whom she had been...</td>
+<td>0.4019</td>
+<td>-0.047637</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">571</td>
+<td>The evening was warm and serene, and we prolon...</td>
+<td>0.5994</td>
+<td>0.401723</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2526</td>
+<td>How did I cling to their dear forms, as someti...</td>
+<td>-0.2003</td>
+<td>-0.024737</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="344ae1f7" class="cell" data-execution_count="63">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sentence_lev_df_31[<span class="st">'Sentiment_Smooth31'</span>].isnull().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="63">
+<pre><code>np.int64(29)</code></pre>
+</div>
+</div>
+<p>The null values can be explained due to the value chosen for rolling mean which is 30, so the first 29 values will be NaN.</p>
+<div id="ce6598e2" class="cell" data-execution_count="64">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>sentence_lev_df_31[<span class="st">'Sentence_31'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="64">
+<pre><code>0        and my family is one of the most distinguishe...
+1       My ancestors had been for many years counsello...
+2       He was respected by all who knew him for his i...
+3       He passed his younger days perpetually occupie...
+4       As the circumstances of his marriage illustrat...
+                              ...                        
+2975    For forty years, he produced and distributed P...
+2976    Project Gutenberg™ eBooks are often created fr...
+2977    Thus, we do not necessarily keep eBooks in com...
+2978    Most people start at our website which has the...
+2979    This website includes information about Projec...
+Name: Sentence_31, Length: 2980, dtype: object</code></pre>
+</div>
+</div>
+</section>
+<section id="for-1818-text" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="for-1818-text"><span class="header-section-number">3.2.2</span> For 1818 Text</h3>
+<div id="cb0c11f9" class="cell" data-execution_count="65">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>sentence_lev_sent_18 <span class="op">=</span>[]</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> s <span class="kw">in</span> sent_tokenize(frank18_clean):</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    sentence_lev_sent_18.append(sid.polarity_scores(s)[<span class="st">'compound'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="c2a38060" class="cell" data-execution_count="66">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>sentence_lev_df_18 <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">'Sentence_18'</span>: sent_tokenize(frank18_clean),</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>     <span class="st">'Sentiment_18'</span>: sentence_lev_sent_18}</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>sentence_lev_df_18[<span class="st">'Sentiment_Smooth18'</span>] <span class="op">=</span> sentence_lev_df_18[<span class="st">'Sentiment_18'</span>].rolling(<span class="dv">30</span>).mean()</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>sentence_lev_df_18.sample(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="66">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sentence_18</th>
+<th data-quarto-table-cell-role="th">Sentiment_18</th>
+<th data-quarto-table-cell-role="th">Sentiment_Smooth18</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1554</td>
+<td>A few incidents now and then directed me, and ...</td>
+<td>0.0000</td>
+<td>-0.181803</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2673</td>
+<td>I pitied Frankenstein; my pity amounted to hor...</td>
+<td>-0.8910</td>
+<td>-0.245647</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1487</td>
+<td>I was like a wild beast that had broken the to...</td>
+<td>-0.6369</td>
+<td>-0.007363</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2498</td>
+<td>learn my miseries, and do not seek to increase...</td>
+<td>-0.5316</td>
+<td>-0.078610</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">458</td>
+<td>M. Krempe was not equally docile; and in my co...</td>
+<td>-0.4201</td>
+<td>0.207007</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="2bcd2f90" class="cell" data-execution_count="67">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>sentence_lev_df_18[<span class="st">'Sentiment_Smooth18'</span>].isnull().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="67">
+<pre><code>np.int64(29)</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="unifying-dataframes" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Unifying Dataframes</h1>
+<div id="0cb1f2da" class="cell" data-execution_count="68">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> sentence_lev_df_18.merge(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    sentence_lev_df_31,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    left_index<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    right_index<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    how<span class="op">=</span><span class="st">'outer'</span>,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    suffixes<span class="op">=</span>(<span class="st">'_18'</span>, <span class="st">'_31'</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"df shape:"</span>, df.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>df shape: (2980, 6)</code></pre>
+</div>
+</div>
+<div id="99400feb" class="cell" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>df.sample(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="69">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sentence_18</th>
+<th data-quarto-table-cell-role="th">Sentiment_18</th>
+<th data-quarto-table-cell-role="th">Sentiment_Smooth18</th>
+<th data-quarto-table-cell-role="th">Sentence_31</th>
+<th data-quarto-table-cell-role="th">Sentiment_31</th>
+<th data-quarto-table-cell-role="th">Sentiment_Smooth31</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2068</td>
+<td>As the images that floated before me became mo...</td>
+<td>0.8834</td>
+<td>-0.218160</td>
+<td>Between two and three in the morning the moon ...</td>
+<td>0.0258</td>
+<td>-0.025397</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">625</td>
+<td>Poor Elizabeth also is quite inconsolable.â€? ...</td>
+<td>-0.7783</td>
+<td>-0.029723</td>
+<td>I wept like a child.</td>
+<td>-0.1280</td>
+<td>-0.036040</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1664</td>
+<td>Depart to your home, and commence your labours...</td>
+<td>-0.3818</td>
+<td>0.064470</td>
+<td>Suddenly, as I gazed on him, an idea seized me...</td>
+<td>-0.5719</td>
+<td>-0.038327</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2941</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1.F.4.</td>
+<td>0.0000</td>
+<td>-0.080110</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1573</td>
+<td>Inflamed by pain, I vowed eternal hatred and v...</td>
+<td>-0.8720</td>
+<td>0.005640</td>
+<td>No: from that moment I declared everlasting wa...</td>
+<td>-0.8689</td>
+<td>-0.219477</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="81279b2d" class="cell" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">10</span>) <span class="co"># change this value to &gt; 35 to see changes in sentiment smooth variables</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="70">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sentence_18</th>
+<th data-quarto-table-cell-role="th">Sentiment_18</th>
+<th data-quarto-table-cell-role="th">Sentiment_Smooth18</th>
+<th data-quarto-table-cell-role="th">Sentence_31</th>
+<th data-quarto-table-cell-role="th">Sentiment_31</th>
+<th data-quarto-table-cell-role="th">Sentiment_Smooth31</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>I am by birth a Genevese; and my family is one...</td>
+<td>0.0000</td>
+<td>NaN</td>
+<td>and my family is one of the most distinguishe...</td>
+<td>0.0000</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>My ancestors had been for many years counsello...</td>
+<td>0.5719</td>
+<td>NaN</td>
+<td>My ancestors had been for many years counsello...</td>
+<td>0.5719</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>He was respected by all who knew him for his i...</td>
+<td>0.6908</td>
+<td>NaN</td>
+<td>He was respected by all who knew him for his i...</td>
+<td>0.6908</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>He passed his younger days perpetually occupie...</td>
+<td>0.3612</td>
+<td>NaN</td>
+<td>He passed his younger days perpetually occupie...</td>
+<td>0.0258</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>As the circumstances of his marriage illustrat...</td>
+<td>0.0000</td>
+<td>NaN</td>
+<td>As the circumstances of his marriage illustrat...</td>
+<td>0.0000</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>One of his most intimate friends was a merchan...</td>
+<td>0.0202</td>
+<td>NaN</td>
+<td>One of his most intimate friends was a merchan...</td>
+<td>0.0202</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>This man, whose name was Beaufort, was of a pr...</td>
+<td>0.4939</td>
+<td>NaN</td>
+<td>This man, whose name was Beaufort, was of a pr...</td>
+<td>0.4939</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Having paid his debts, therefore, in the most ...</td>
+<td>0.5256</td>
+<td>NaN</td>
+<td>Having paid his debts, therefore, in the most ...</td>
+<td>0.5256</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>My father loved Beaufort with the truest frien...</td>
+<td>0.6378</td>
+<td>NaN</td>
+<td>My father loved Beaufort with the truest frien...</td>
+<td>0.6378</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>He grieved also for the loss of his society, a...</td>
+<td>-0.2500</td>
+<td>NaN</td>
+<td>He bitterly deplored the false pride which led...</td>
+<td>0.8930</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>By this point, we have the rolling mean sentiment scores for both versions of Frankenstein. As we can see, by index value 9, the datasets diverge.</p>
+</section>
+<section id="first-visual-analysis" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> First Visual Analysis</h1>
+<div id="f114e4de" class="cell" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>rough_graph <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">30</span>, <span class="dv">4</span>))</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>df.index.to_list(), y<span class="op">=</span><span class="st">'Sentiment_Smooth31'</span>, data<span class="op">=</span>df, label <span class="op">=</span> <span class="st">'Frankenstein 1831'</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>df.index.to_list(), y<span class="op">=</span><span class="st">'Sentiment_Smooth18'</span>, data<span class="op">=</span>df, label <span class="op">=</span> <span class="st">'Frankenstein 1818'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="frankenstein_nlp_project_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="6acaab15" class="cell" data-execution_count="72">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"The overall difference in book length is </span><span class="sc">{</span><span class="bu">len</span>(frank18_clean) <span class="op">-</span> <span class="bu">len</span>(frank31_clean)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The overall difference in book length is -27594</code></pre>
+</div>
+</div>
+<p>Notice how 1831 version is longer than the 1818 version. This is very much the expected outcome of comparing two different books. In order to solve this issue, we can impute or randomly drop values from either the minority or majority class variable respectively. We will do both methods and compare for reliability.</p>
+</section>
+<section id="solution-1-randomly-dropping-values-in-1831" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Solution 1: Randomly Dropping Values in 1831</h1>
+<div id="5eee609d" class="cell" data-execution_count="73">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>df.sample(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="73">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sentence_18</th>
+<th data-quarto-table-cell-role="th">Sentiment_18</th>
+<th data-quarto-table-cell-role="th">Sentiment_Smooth18</th>
+<th data-quarto-table-cell-role="th">Sentence_31</th>
+<th data-quarto-table-cell-role="th">Sentiment_31</th>
+<th data-quarto-table-cell-role="th">Sentiment_Smooth31</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">946</td>
+<td>and, oh, that I could, with the extinction of ...</td>
+<td>-0.5562</td>
+<td>-0.041683</td>
+<td>I performed the first part of my journey on ho...</td>
+<td>0.0000</td>
+<td>0.055437</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1936</td>
+<td>Your hours will pass in dread and misery, and ...</td>
+<td>-0.4767</td>
+<td>-0.273193</td>
+<td>“I could pass my life here,” said he to me; “a...</td>
+<td>-0.2967</td>
+<td>0.196863</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1637</td>
+<td>Let me see that I excite the sympathy of some ...</td>
+<td>0.7862</td>
+<td>-0.010317</td>
+<td>I felt emotions of gentleness and pleasure, th...</td>
+<td>0.2023</td>
+<td>-0.109467</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="c8fc7990" class="cell" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df_dropped <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'Sentiment_Smooth31'</span>]</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="4c190cc1" class="cell" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>df_temp_18 <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'Sentiment_Smooth18'</span>]</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>).dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="e68cd8ca" class="cell" data-execution_count="76">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(df_temp_18)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="76">
+<pre><code>2716</code></pre>
+</div>
+</div>
+<div id="6b88e0c2" class="cell" data-execution_count="77">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(df_dropped)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="77">
+<pre><code>2980</code></pre>
+</div>
+</div>
+<div id="79a6845e" class="cell" data-execution_count="78">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>df_dropped <span class="op">=</span> df_dropped.sample(n<span class="op">=</span>df_temp_18.shape[<span class="dv">0</span>]).sort_index().reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(df_dropped)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="78">
+<pre><code>2716</code></pre>
+</div>
+</div>
+<div id="93255919" class="cell" data-execution_count="79">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>df_dropped.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="79">
+<pre><code>(2716, 1)</code></pre>
+</div>
+</div>
+<div id="8140e766" class="cell" data-execution_count="80">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">len</span>(df[<span class="st">'Sentence_18'</span>]),</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'Sentence_18'</span>].isnull().<span class="bu">sum</span>()</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2980 235</code></pre>
+</div>
+</div>
+<div id="c9c028d0" class="cell" data-execution_count="81">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">len</span>(df[<span class="st">'Sentence_31'</span>]),</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'Sentence_31'</span>].isnull().<span class="bu">sum</span>()</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2980 0</code></pre>
+</div>
+</div>
+<div id="f5223481" class="cell" data-execution_count="82">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>dropped_graph <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">30</span>, <span class="dv">4</span>))</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>df_dropped.index.to_list(), y<span class="op">=</span><span class="st">'Sentiment_Smooth31'</span>, data<span class="op">=</span>df_dropped, label <span class="op">=</span> <span class="st">'Frankenstein 1831'</span>)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>df.index.to_list(), y<span class="op">=</span><span class="st">'Sentiment_Smooth18'</span>, data<span class="op">=</span>df, label <span class="op">=</span> <span class="st">'Frankenstein 1818'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="frankenstein_nlp_project_files/figure-html/cell-37-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="solution-2-imputing-new-values-in-1818" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Solution 2: Imputing new values in 1818</h1>
+<p>The method to perform this operation will be to get a scale factor by which to increase the length of the 1818 text to. This will be done by dividing the length of the 1831 text by the length of the 1818 text.</p>
+<div id="eb4eb080" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>frank31_len <span class="op">=</span> <span class="bu">len</span>(sent_tokenize(frank31_clean))</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>frank18_len <span class="op">=</span> <span class="bu">len</span>(sent_tokenize(frank18_clean))</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"The length of the 1831 edition is </span><span class="sc">{</span>frank31_len<span class="sc">}</span><span class="ss"> and the length of the 1818 edition is </span><span class="sc">{</span>frank18_len<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The length of the 1831 edition is 2980 and the length of the 1818 edition is 2745</code></pre>
+</div>
+</div>
+<div id="55b4b6f7" class="cell" data-execution_count="84">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>scale_factor <span class="op">=</span> <span class="dv">2980</span> <span class="op">/</span> <span class="dv">2745</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>scale_factor</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="84">
+<pre><code>1.0856102003642987</code></pre>
+</div>
+</div>
+<div id="275df890" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>df_impute <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'Sentiment_Smooth18'</span>]</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="eda75e72" class="cell" data-execution_count="86">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>new_index <span class="op">=</span> df_impute.index.to_list()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="707e647a" class="cell" data-execution_count="87">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>new_index <span class="op">=</span> [<span class="bu">int</span>(i <span class="op">*</span> scale_factor) <span class="cf">for</span> i <span class="kw">in</span> new_index]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="7a569c44" class="cell" data-execution_count="88">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>df_impute.index <span class="op">=</span> new_index</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>df_impute</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="88">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sentiment_Smooth18</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3229</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3230</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3231</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3232</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3234</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+
+<p>2980 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<div id="db15d2f9" class="cell" data-execution_count="89">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>imputed_graph <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">30</span>, <span class="dv">4</span>))</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>df.index.to_list(), y<span class="op">=</span><span class="st">'Sentiment_Smooth31'</span>, data<span class="op">=</span>df, label <span class="op">=</span> <span class="st">'Frankenstein 1831'</span>)</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>df_impute.index.to_list(), y<span class="op">=</span><span class="st">'Sentiment_Smooth18'</span>, data<span class="op">=</span>df_impute, label <span class="op">=</span> <span class="st">'Frankenstein 1818'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="frankenstein_nlp_project_files/figure-html/cell-44-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="all-graphs" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> All Graphs</h1>
+<div id="328a4b9b" class="cell" data-execution_count="91">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>rough_graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="91">
+<div>
+<figure class="figure">
+<p><img src="frankenstein_nlp_project_files/figure-html/cell-45-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="db9508b2" class="cell" data-execution_count="92">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>dropped_graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="92">
+<div>
+<figure class="figure">
+<p><img src="frankenstein_nlp_project_files/figure-html/cell-46-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="1d15cdf7" class="cell" data-execution_count="93">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>imputed_graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="93">
+<div>
+<figure class="figure">
+<p><img src="frankenstein_nlp_project_files/figure-html/cell-47-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="discussion" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Discussion</h1>
+<p>Overall, both methods of balancing the datasets produced similar results. There are some differences in the peaks and valleys of the sentiment scores, but the overall trends are consistent across both methods. This suggests that our findings are robust to the method of balancing used. Additional indicators of reliability would be the near perfect matchup of both smoothed sentiment lines at around the 1000 mark on the imputed graph.</p>
+<p>In my own opinion, the expansion of the 1818 text through imputation seems to have produced a better result than the random dropped graph. While accounting for the variance between comparisons, the imputed graph seems to have a closer alignment of peaks and valleys between the two texts.</p>
+<p>Additionally the results have an interesting literary implication. In the 1818 text, the stronger peaks in sentiment tend to occur earlier than the 1831 peaks until around the halfway mark where it switches after syncing up near the 1000 mark. The patterns in the data may indicate that overall, both editions share the same sentiment patterns at roughly the same times, however, the degree to which sentiment differs in some areas are interesting to point out. Take the 1500 - 2000 range for instance, where the sentiment context is certainly present in both texts however the height of peaks vary more. The starkest difference to note is the ending where the contextual sentiment overlap splits dramatically. This may indicate that the changes made in the 1831 edition altered the tone of the ending significantly compared to the original 1818 text. This could be a point of further literary analysis to explore how the revisions impacted the overall sentiment and themes of the novel’s conclusion.</p>
+<p>This analysis demonstrates how NLP techniques can be applied to literary texts to uncover insights about authorial revisions and their effects on narrative tone. By quantitatively comparing sentiment across different editions, we can gain a deeper understanding of how changes in language reflect shifts in thematic emphasis and emotional impact. This approach demonstrates the potential of computational methods to enhance the traditional study of literature.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
