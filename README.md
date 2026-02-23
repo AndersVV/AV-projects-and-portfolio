@@ -10,8 +10,8 @@ Welcome to my central hub for data science and statistical analysis projects. Th
 An advanced analysis combining Natural Language Processing with statistical inference to analyze workplace activity data.
 
 *   **Key Concepts:** NLP, Analysis of Variance (Anova), Text Mining.
-*   **Repo:** [Link to Repository](https://github.com/AndersVV/frankenstein_nlp_project.git)
-*   **Notebook:** [View Analysis](https://github.com/AndersVV/frankenstein_nlp_project.git/blob/main/frankenstein_nlp_project.ipynb)
+*   **Repo:** [frankenstein_nlp_project](https://github.com/AndersVV/frankenstein_nlp_project.git)
+*   **Notebook:** [View Analysis](https://github.com/AndersVV/frankenstein_nlp_project/blob/main/frankenstein_nlp_project.ipynb)
 *   **Presentation:** [View Slides/Paper](https://github.com/YOUR_USERNAME/REPO_NAME_1/blob/main/PRESENTATION_PATH)
 
 ### 2. Wine Quality PCA
