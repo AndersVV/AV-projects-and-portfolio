@@ -1,10 +1,10 @@
 # Project Dashboard & Portfolio
 
-Welcome to my central hub for data science and statistical analysis projects. This repository serves as an index for my work, ranging from Natural Language Processing to Dimensionality Reduction.
+Welcome to my central hub for data science and statistical analysis projects. As a Data Scientist in Human Behavior, I apply my skills to a broad range of interests. This repository serves as an index for my work, ranging  across a multitude of different disciplines including but not limited to I/O Psychology, Food Science, Product Development, and Text Analysis. 
 
 ---
 
-## 🚀 Featured Projects
+## Featured Projects
 
 ### 1. Frankenstein NLP Activity-Based Workplace Anova
 An advanced analysis combining Natural Language Processing with statistical inference to analyze workplace activity data.
@@ -28,7 +28,7 @@ An Anova Pre-test Post-test study on the effects of Activity-Based Workplace imp
 *   **Key Concepts:** Pre-test Post-test, Industrial/Organizational Policy
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 *   **Languages:** Python, R
 *   **Libraries:** Pandas, NumPy, Scikit-Learn, NLTK
@@ -37,9 +37,9 @@ An Anova Pre-test Post-test study on the effects of Activity-Based Workplace imp
 
 ---
 
-## 📞 Contact
+## Contact
 
 Feel free to reach out for collaborations or questions.
 
 *   **GitHub:** [AndersVV](https://github.com/AndersVV)
-*   **Email:** _avvillwo@gmail.com_
+*   **Email:** 123_avvillwo@gmail.com_456
